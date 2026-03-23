@@ -15,7 +15,7 @@ DTO-based architecture for clean API contracts
 
 HybridCache integration for faster product retrieval
 
-## Order Management
+### Order Management
 
 Create orders linked to the authenticated user
 
@@ -26,7 +26,8 @@ Retrieve all orders for a specific user
 Entity relationships handled via Entity Framework Core
 
 Order → OrderItems → Product
-### Authentication & Security
+
+## Authentication & Security
 
 JWT-based authentication
 
@@ -40,40 +41,27 @@ Protected access to user-specific resources
 
 The project follows a layered clean architecture to keep concerns separated and maintainable.
 
-Controllers
-
-Handle HTTP requests and responses
-
-Services
-
-Contain business logic
-
-Handle DTO mapping and validation
-
-Repositories
-
-Responsible for database access
-
-Encapsulate Entity Framework queries
-
-Entities
-
-Core domain models
-
-DTOs
-
-Request and response models used by the API
-
-Data
-
-Database configuration and EF Core migrations
+- Controllers
+- Handle HTTP requests and responses
+- Services
+- Contain business logic
+- Handle DTO mapping and validation
+- Repositories
+- Responsible for database access
+- Encapsulate Entity Framework queries
+- Entities
+- Core domain models
+- DTOs
+- Request and response models used by the API
+- Data
+- Database configuration and EF Core migrations
 
 ## Tech Stack
-Technology	Purpose
-ASP.NET Core 8	API framework
-Entity Framework Core	ORM and database access
-SQL Server / SQLite	Database
-JWT Authentication	Authentication and authorization
-HybridCache	High-performance caching
-AutoMapper (optional)	DTO mapping
-Swagger / OpenAPI	API documentation
+- Technology	Purpose
+- ASP.NET Core 8	API framework
+- Entity Framework Core	ORM and database access
+- SQL Server / SQLite	Database
+- JWT Authentication	Authentication and authorization
+- HybridCache	High-performance caching
+- AutoMapper (optional)	DTO mapping
+
