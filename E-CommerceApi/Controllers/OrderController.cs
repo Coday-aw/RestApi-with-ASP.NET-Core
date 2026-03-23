@@ -30,6 +30,7 @@ public class OrderController : ControllerBase
     public async Task<ActionResult<IEnumerable<OrderResponseDto>>> GetOrdersAsync()
     {
         var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null) return BadRequest();
         var response = await _orderService.GetOrders(userId);
         return Ok(response);
     }

@@ -19,14 +19,14 @@ public class OrderService : IOrderService
 
     public async Task<IEnumerable<OrderResponseDto>> GetOrders(string userId)
     {
-        // 1. Get order from order repository
+        // Get order from order repository
         var orders = await _orderRepository.GetOrdersByUserAsync(userId);
        
-        // 2. if user dont have orders send back empty dto
+        // if user dont have orders send back empty dto
        if (!orders.Any())
            return new List<OrderResponseDto>();
        
-       // 3. if user have orders send back a list of the orders
+       // if user have orders send back a list of the orders
        return orders.Select(o => new OrderResponseDto(
            o.Id,
            o.OrderDate,
@@ -42,7 +42,7 @@ public class OrderService : IOrderService
 
     public async Task<OrderResponseDto> CreateOrder(OrderRequestDto orderRequestDto, string userId)
     {
-        // 1. Put values from dto to create a new order
+        // Put values from dto to create a new order
         var order = new Order
         {
             OrderDate = DateTime.Now,
@@ -54,10 +54,10 @@ public class OrderService : IOrderService
             }).ToList()
         };
         
-        // 2. Send the new order to order repository put the order in the database
+        // Send the new order to order repository put the order in the database
        var newOrder = await _orderRepository.CreateOrderAsync(order);
        
-       // 3. Create dto response and send back to client
+       // Create dto response and send back to client
        return new OrderResponseDto(
            newOrder.Id,
            newOrder.OrderDate,

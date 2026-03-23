@@ -39,7 +39,9 @@ Accept: application/json
 
 ### 
 GET https://api.chucknorris.io/jokes/random
+Accept: application/json
 
 ### 
 GET {{E_CommerceApi_HostAddress}}/api/external/weather
+Accept: application/json
 

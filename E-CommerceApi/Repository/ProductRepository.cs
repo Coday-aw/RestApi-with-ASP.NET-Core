@@ -27,10 +27,9 @@ public class ProductRepository : IProductRepository
 
     public async Task<Product> GetProductByIdAsync(int id)
     {
-        
+        // cache key is the product id
         var cacheKey = $"product_{id}";
-
-       
+        // check if the product is cached if not get product from database 
         var product = await _cache.GetOrCreateAsync(
             cacheKey,
             async cancel =>
@@ -42,13 +41,12 @@ public class ProductRepository : IProductRepository
                 Expiration = TimeSpan.FromMinutes(5)
             });
         
-        if (product == null) throw new NotFoundException($"product with id {id} not found");
-        
         return product;
     }
 
     public async Task<Product> CreateProductAsync(Product product)
     {
+        // create new product
         var newProduct = new Product
         {
             Name = product.Name,
@@ -58,7 +56,9 @@ public class ProductRepository : IProductRepository
             Stock = product.Stock
         };
 
+        // add to database 
         await _context.Products.AddAsync(newProduct);
+        // save changes
         await _context.SaveChangesAsync();
         
         return newProduct;
@@ -66,17 +66,19 @@ public class ProductRepository : IProductRepository
 
     public async Task<bool> UpdateProductAsync( Product product)
     {
+        // find product
         var findProduct = await _context.Products.FirstOrDefaultAsync(p => p.Id == product.Id);
-
-        if (findProduct == null) 
+        // if not found throw not found exception 
+        if (findProduct == null)
             throw new NotFoundException($"product with id {product.Id} not found");
-
+        // update the product with new changes
         findProduct.Name = product.Name;
         findProduct.Price = product.Price;
         findProduct.Description = product.Description;
         findProduct.Category = product.Category;
         findProduct.Stock = product.Stock;
         
+        //  save changes and remove from cached
         await _context.SaveChangesAsync();
         await _cache.RemoveAsync($"product_{product.Id}");
        
@@ -85,13 +87,16 @@ public class ProductRepository : IProductRepository
 
     public async Task<bool> DeleteProductAsync(int id)
     {
+        //  find product 
         var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
-
+        //  if not found throw exception 
         if (product == null) 
             throw new  NotFoundException($"product with id {id} not found");
-
+        // remove product
         _context.Products.Remove(product);
+        // save changes 
         await _context.SaveChangesAsync();
+        // remove from cached
         await _cache.RemoveAsync($"product_{id}");
 
         return true;

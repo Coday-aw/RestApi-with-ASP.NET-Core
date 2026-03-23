@@ -27,11 +27,11 @@ public class AuthController : ControllerBase
     {
         try
         {
-            //1 validate DTO modell
+            // validate DTO modell
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            //2 Create a new user/user
+            // Create a new user/customer
             var newUser = new User
             {
                 FirstName = user.FirstName,
@@ -40,13 +40,13 @@ public class AuthController : ControllerBase
                 Email = user.Email,
             };
 
-            //3 Create user/user in Identity
+            // Create the user/customer in Identity
             var result = await _userManager.CreateAsync(newUser, user.Password);
 
             if (!result.Succeeded)
                 return BadRequest(result.Errors);
 
-            //4 Add user/user role
+            // Add role
             await _userManager.AddToRoleAsync(newUser, "Customer");
     
             return Ok(new { Message = "Registration Successful" });
@@ -61,7 +61,7 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] UserLoginDto userDto)
     {
-        //1 validate DTO modell
+        // validate DTO modell
         if (!ModelState.IsValid)
             return BadRequest();
         
@@ -80,6 +80,5 @@ public class AuthController : ControllerBase
         
         // send back token
         return Ok(new {message = "Login Successful", token});
-
     }
 }
