@@ -65,7 +65,7 @@ The project follows a layered clean architecture to keep concerns separated and 
 - HybridCache	High-performance caching
 - AutoMapper (optional)	DTO mapping
 
-### ERD
+## ERD
 <img width="927" height="521" alt="Skärmavbild 2026-03-23 kl  16 23 15" src="https://github.com/user-attachments/assets/791fa4cf-70e3-4d18-8a11-30f1f000a826" />
 
 <img width="778" height="484" alt="Skärmavbild 2026-03-23 kl  16 23 29" src="https://github.com/user-attachments/assets/890481cf-55db-4383-89ae-7611ce24d9ad" />
