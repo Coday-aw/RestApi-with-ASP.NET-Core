@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace E_CommerceApi.Controllers;
 
+[Route("api/orders")]
+[ApiController]
 public class OrderController : ControllerBase
 {
     private readonly IOrderService  _orderService;

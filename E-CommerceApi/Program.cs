@@ -11,7 +11,9 @@ using E_CommerceApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
+using Polly;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +23,41 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+
+
+builder.Services.AddHttpClient<IWeatherService, WeatherService>(client =>
+    {
+        var config = builder.Configuration;
+        client.BaseAddress = new Uri(config["WeatherApi:BaseUrl"]);
+    })
+    .AddPolicyHandler(Policy<HttpResponseMessage>
+        .Handle<HttpRequestException>()
+        .WaitAndRetryAsync(
+            retryCount: 3,
+            sleepDurationProvider: attempt => TimeSpan.FromSeconds(Math.Pow(2, attempt - 1))
+        ));
+
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.AddFixedWindowLimiter("fixed_window", config =>
+    {
+        config.Window = TimeSpan.FromMinutes(1);
+        config.PermitLimit = 100;
+        config.QueueLimit = 0;
+    });
+
+    options.AddSlidingWindowLimiter("sliding_window", config =>
+    {
+        config.Window = TimeSpan.FromMinutes(1);
+        config.SegmentsPerWindow = 6;
+        config.PermitLimit = 10;
+    });
+});
 
 builder.Services.AddProblemDetails(options =>
 {
@@ -88,6 +125,12 @@ app.UseExceptionHandler(exceptionApp =>
                 Title = "Not Found",
                 Detail = ex.Message
             },
+            InsufficientException ex => new ProblemDetails
+            {
+                Status = 409,
+                Title = "Insufficient Access",
+                Detail = ex.Message
+            },
             _ => new ProblemDetails
             {
                 Status = 500,
@@ -147,7 +190,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 

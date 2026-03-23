@@ -24,6 +24,7 @@ public class ProductRepository : IProductRepository
         return await Task.FromResult(_context.Products.AsQueryable());
     }
     
+
     public async Task<Product> GetProductByIdAsync(int id)
     {
         

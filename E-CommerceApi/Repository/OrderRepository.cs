@@ -11,7 +11,6 @@ namespace E_CommerceApi.Repository;
 public class OrderRepository : IOrderRepository
 {
     private readonly ApplicationDbContext _context;
-
     public OrderRepository(ApplicationDbContext context)
     {
         _context = context;
@@ -25,18 +24,45 @@ public class OrderRepository : IOrderRepository
             .ThenInclude(itm => itm.Product).ToListAsync();
         return orders;
     }
-
+    
+    
     public async Task<Order> CreateOrderAsync(Order order)
     {
+        // 1. Get all ids of all product from order.items
+        var productsIds = order.Items.Select(i => i.ProductId).ToList();
+        
+        // 2. Get the products that contains the id from productsIds
+        var products = await _context.Products.Where(p => productsIds.Contains(p.Id)).ToListAsync();
+
+        // 3. Convert to Dictionary for faster loopup 
+        var productDictionary = products.ToDictionary(p => p.Id);
+        
+        // 4. Loop all products 
+        foreach (var item in order.Items)
+        {
+            // if product exist 
+            if(!productDictionary.TryGetValue(item.ProductId, out var product))
+                throw new NotFoundException($"product with id {item.Id} not found");
+            // check if product quantity is in stock 
+            if (product.Stock < item.Quantity)
+                throw new InsufficientException($"Not enough stock for product with id: {item.Id}");
+        }
+        // 4. Loop all items in order and decrease stock 
+        foreach (var item in order.Items)
+        {
+            var product =  productDictionary[item.ProductId];
+            product.Stock -= item.Quantity;
+        }
+        // 6. Create order 
         var newOrder = new Order
         {
             OrderDate = order.OrderDate,
             UserId = order.UserId,
             Items = order.Items,
         };
-
+        // 7. Add order and save changes and return newOrder
         await _context.Orders.AddAsync(newOrder);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(); 
         return newOrder;
     }
 }

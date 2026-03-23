@@ -20,6 +20,8 @@ public class ProductService : IProductService
         string? category,
         int? miniPrice)
     {
+        
+        // 1. Get all
         var query = await _repository.GetAllProductsAsync();
       
       if (!string.IsNullOrEmpty(category))
