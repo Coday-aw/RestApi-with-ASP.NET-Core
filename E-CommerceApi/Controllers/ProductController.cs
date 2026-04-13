@@ -8,7 +8,7 @@ namespace E_CommerceApi.Controllers;
 
 [Route("api/products")]
 [ApiController]
-[EnableRateLimiting("fixed_segment")]
+[EnableRateLimiting("fixed_window")]
 public class ProductController : ControllerBase
 {
    private readonly IProductService _productService;
